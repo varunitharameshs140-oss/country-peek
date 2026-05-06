@@ -38,7 +38,7 @@ function CountryCard({ country }) {
 
         <p>
           <strong>Capital:</strong>{' '}
-          {capital?.[0] || 'N/A'}
+          {capital?.[0] ?? 'N/A'}
         </p>
       </div>
     </Link>

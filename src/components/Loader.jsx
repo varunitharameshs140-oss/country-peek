@@ -1,9 +1,5 @@
 function Loader() {
-  return (
-    <p className="loader">
-      Loading countries...
-    </p>
-  )
+  return <p>Loading...</p>
 }
 
 export default Loader
