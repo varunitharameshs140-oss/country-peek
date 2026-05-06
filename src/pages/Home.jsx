@@ -1,24 +1,48 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import CountryCard from '../components/CountryCard'
 import Loader from '../components/Loader'
-import useCountries from '../hooks/useCountries'
 
 function Home() {
   const [search, setSearch] = useState('')
+  const [countries, setCountries] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const {
-    countries,
-    loading,
-    error,
-  } = useCountries()
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!search) {
+        setCountries([])
+        return
+      }
 
-  const filteredCountries = useMemo(() => {
-    return countries.filter((country) =>
-      country.name.common
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-    )
-  }, [countries, search])
+      async function fetchCountries() {
+        try {
+          setLoading(true)
+          setError('')
+
+          const response = await fetch(
+            `https://restcountries.com/v3.1/name/${search}`,
+          )
+
+          if (!response.ok) {
+            throw new Error('No countries found.')
+          }
+
+          const data = await response.json()
+          setCountries(data)
+        } catch (err) {
+          setError(err.message)
+          setCountries([])
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      fetchCountries()
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [search])
 
   return (
     <section className="home">
@@ -29,27 +53,14 @@ function Home() {
         onChange={(e) =>
           setSearch(e.target.value)
         }
-        className="search"
       />
 
       {loading && <Loader />}
 
-      {error && (
-        <p className="home__status home__status--error">
-          {error}
-        </p>
-      )}
-
-      {!loading &&
-        !error &&
-        filteredCountries.length === 0 && (
-          <p className="home__status">
-            No countries found.
-          </p>
-        )}
+      {error && <p>{error}</p>}
 
       <div className="card-grid">
-        {filteredCountries.map((country) => (
+        {countries.map((country) => (
           <CountryCard
             key={country.cca3}
             country={country}
