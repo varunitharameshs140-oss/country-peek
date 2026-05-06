@@ -20,6 +20,11 @@ function Home() {
           setLoading(true)
           setError('')
 
+          // temporary delay for loading demo
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000)
+          )
+
           const response = await fetch(
             `https://restcountries.com/v3.1/name/${search}`,
           )
